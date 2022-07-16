@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+    <project>
+        <path>$WS_DIR$\Project.ewp</path>
+    </project>
+    <batchBuild>
+        <batchDefinition>
+            <name>debug_bnrg2</name>
+            <member>
+                <project>BlueNRG_Mesh_Lib</project>
+                <configuration>Debug</configuration>
+            </member>
+            <member>
+                <project>Project</project>
+                <configuration>Sensor-STM32_BNRG2A1</configuration>
+            </member>
+        </batchDefinition>
+    </batchBuild>
+</workspace>

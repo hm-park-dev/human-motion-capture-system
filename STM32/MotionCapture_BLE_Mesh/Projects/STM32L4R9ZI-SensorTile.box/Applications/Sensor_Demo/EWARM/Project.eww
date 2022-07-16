@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+    <project>
+        <path>$WS_DIR$\Project.ewp</path>
+    </project>
+    <batchBuild>
+        <batchDefinition>
+            <name>Release</name>
+            <member>
+                <project>BlueNRG_Mesh_Lib</project>
+                <configuration>Release</configuration>
+            </member>
+            <member>
+                <project>Project</project>
+                <configuration>Sensor-STBOX</configuration>
+            </member>
+        </batchDefinition>
+    </batchBuild>
+</workspace>
