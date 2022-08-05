@@ -8,6 +8,7 @@ using System;
 public class move : MonoBehaviour
 {
     // Serial Port Test
+    public GameObject model;
     public Text serialText;
 
     SerialPort m_SerialPort = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
@@ -32,6 +33,7 @@ public class move : MonoBehaviour
 
     double pitch;
     double roll;
+    double yaw;
 
     Kalman kalmanX = new Kalman();
     Kalman kalmanY = new Kalman();
@@ -142,8 +144,9 @@ public class move : MonoBehaviour
         if (gyroYangle < -180 || gyroYangle > 180)
             gyroYangle = kalAngleY;
 
-        Debug.Log(kalAngleX.ToString() + " " + kalAngleY.ToString());
-        this.transform.rotation = Quaternion.Euler((float)kalAngleX, (float)kalAngleY, 0);
+        //Debug.Log(kalAngleX.ToString() + " " + kalAngleY.ToString());
+        yaw = 180 * Math.Atan(Math.Sqrt(y_acc * y_acc + x_acc * x_acc) / z_acc) / Math.PI;
+        model.transform.rotation = Quaternion.Euler((float)kalAngleX, (float)kalAngleY, (float)yaw);
     }
 
 

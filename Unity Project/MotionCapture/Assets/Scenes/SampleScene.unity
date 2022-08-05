@@ -140,6 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75b9012be7475434985d79ffc7d30fb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  model: {fileID: 1301652762}
   serialText: {fileID: 1784016049}
   setOrigin: 0
 --- !u!1 &163529659
@@ -488,6 +489,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1301652762 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
+  m_PrefabInstance: {fileID: 2022458466}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1784016047
 GameObject:
   m_ObjectHideFlags: 0
