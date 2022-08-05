@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO.Ports;
 using System;
 
 public class move : MonoBehaviour
 {
+    // Serial Port Test
+    public Text serialText;
+
     SerialPort m_SerialPort = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
     string m_Data = null;
     public bool setOrigin = false;
@@ -82,7 +86,10 @@ public class move : MonoBehaviour
         }
 
 
-
+        serialText.text = "ACC: " + x_acc.ToString() + " " + y_acc.ToString() + " " + z_acc.ToString() 
+            + "\nGYR: " + x_gyr.ToString() + " " + y_gyr.ToString() + " " + z_gyr.ToString() 
+            + "\nMAG: " + x_mag.ToString() + " " + y_mag.ToString() + " " + z_mag.ToString();
+        /*
         if (x_acc != 0 && y_acc != 0 && z_acc != 0 && x_gyr != 0 && y_gyr != 0 && z_gyr != 0 && x_mag != 0 && y_mag != 0 && z_mag != 0)
         {
             double pitch = 180 * Math.Atan2(x_acc, Math.Sqrt(y_acc * y_acc + z_acc * z_acc)) / Math.PI;
@@ -94,6 +101,7 @@ public class move : MonoBehaviour
 
             this.transform.rotation = Quaternion.Euler((float)pitch, (float)roll, 0);
         }
+        */
     }
 
 
