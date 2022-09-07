@@ -2,239 +2,274 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO.Ports;
+
 using System;
+using System.Linq;
+using System.IO.Ports;
+using SimpleCircularBuffer;
 
-public class move : MonoBehaviour
+using FusionFx;
+
+public class Move : MonoBehaviour
 {
-    // Serial Port Test
-    public GameObject model;
-    public Text serialText;
+    [Header("Serial Conf")]
+    [SerializeField] private int baudrate = 921600;
+    [SerializeField] private String comPort = "COM3";
+    SerialPort port;
+    private int bufSize = 512;
+    private SimpleCircularBuffer<byte> buf;
 
-    SerialPort m_SerialPort = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
-    string m_Data = null;
-    public bool setOrigin = false;
-    Quaternion rotOffset = Quaternion.identity;
+    private const int TMsg_MaxLen = 256;
 
-    const double RAD_TO_DEG = 180 / Math.PI;
-    const float dt = 1000.0f;
+    private const byte TMsg_EOF = 0xF0;
+    private const byte TMsg_BS = 0xF1;
+    private const byte TMsg_BS_EOF = 0xF2;
 
-    float x_acc = 0;
-    float y_acc = 0;
-    float z_acc = 0;
+	[Header("Segment")]
+	[SerializeField] private Transform segment;
+	[SerializeField] private Transform segCore;
+	[SerializeField] private Transform testCore;
 
-    float x_gyr = 0;
-    float y_gyr = 0;
-    float z_gyr = 0;
+	[Header("Text")]
+    [SerializeField] private Text heTxt;
 
-    float x_mag = 0;
-    float y_mag = 0;
-    float z_mag = 0;
+    private bool isCalibrate = false;
+    private bool doCalibarate = false;
+    private Vector3 calibrationVector;
 
-    double pitch;
-    double roll;
-    double yaw;
-
-    Kalman kalmanX = new Kalman();
-    Kalman kalmanY = new Kalman();
-    double gyroXangle, gyroYangle; // Angle calculate using the gyro only
-    double compAngleX, compAngleY; // Calculated angle using a complementary filter
-    double kalAngleX, kalAngleY; // Calculated angle using a Kalman filter
+    private string segName;
 
 
     void Start()
     {
-        m_SerialPort.Open();
+        buf = new SimpleCircularBuffer<byte>(bufSize, true);
 
-        if (setOrigin)
-        {
-            rotOffset = this.transform.rotation;
-            setOrigin = false;
-        }
+        port = new SerialPort(comPort, baudrate, Parity.None, 8, StopBits.One);
+
+        port.Open();
+
+        heTxt.GetComponent<Text>().text = comPort;
     }
 
     private void Update()
     {
-        Test();
-    }
+		try
+		{
+			if (port.IsOpen && port.BytesToRead > 0)
+			{
+				var tBuf = new byte[bufSize];
+				var readLen = port.Read(tBuf, 0, TMsg_MaxLen);
+				// Debug.Log(string.Join(", ",tBuf));
 
-    void Test()
-    {
-        try
-        {
-            if (m_SerialPort.IsOpen)
-            {
-                m_Data = m_SerialPort.ReadLine();
-                m_SerialPort.ReadTimeout = 1000;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
+				if (readLen > 0)
+				{
+					buf.Push(tBuf, 0, readLen);
 
-        string[] values = m_Data.Split(',');
+					int bufLen = buf.Used;
 
-        if (values.Length == 5 && values[0] == "ACC") // Rotation of the first one 
-        {
-            x_acc = float.Parse(values[2]);
-            y_acc = float.Parse(values[3]);
-            z_acc = float.Parse(values[4]);
-            // this.transform.rotation = new Quaternion(w, x, y, z) * Quaternion.Inverse(rotOffset);
-        }
-        else if (values.Length == 5 && values[0] == "GYR")
-        {
-            x_gyr = float.Parse(values[2]);
-            y_gyr = float.Parse(values[3]);
-            z_gyr = float.Parse(values[4]);
-        }
-        else if (values.Length == 5 && values[0] == "MAG")
-        {
-            x_mag = float.Parse(values[2]);
-            y_mag = float.Parse(values[3]);
-            z_mag = float.Parse(values[4]);
-        }
-        else if (values.Length != 5)
-        {
-            Debug.LogWarning(m_Data);
-        }
+					for (int i = 0; i < bufLen; i++)
+					{
+						if (buf.Get(i) == TMsg_EOF)
+						{
+							//Debug.Log("len : " + i);
 
-        
-        serialText.text = "ACC: " + x_acc.ToString() + " " + y_acc.ToString() + " " + z_acc.ToString() 
-            + "\nGYR: " + x_gyr.ToString() + " " + y_gyr.ToString() + " " + z_gyr.ToString() 
-            + "\nMAG: " + x_mag.ToString() + " " + y_mag.ToString() + " " + z_mag.ToString();
-        
+							var frame = new byte[i + 1];
+							int frameLen = 0;
 
-        pitch = 180 * Math.Atan2(-x_acc, Math.Sqrt(y_acc * y_acc + z_acc * z_acc)) / Math.PI;
-        // double roll = 180 * Math.Atan2(y_acc, Math.Sqrt(x_acc * x_acc + z_acc * z_acc)) / Math.PI;
-        roll = 180 * Math.Atan2(y_acc, z_acc) / Math.PI;
-    
-        gyroXangle = roll;
-        gyroYangle = pitch;
-        compAngleX = roll;
-        compAngleY = pitch;
-        double gyroXrate = x_gyr / 131.0; // Convert to deg/s
-        double gyroYrate = y_gyr / 131.0; // Convert to deg/s
+							for (int idx = 0; idx < i; idx++)
+							{
+								if (buf.Get(idx) == TMsg_BS)
+								{
+									if (buf.Get(idx + 1) == TMsg_BS) frame[frameLen] = TMsg_BS;
+									else if (buf.Get(idx + 1) == TMsg_BS_EOF) frame[frameLen] = TMsg_EOF;
+									else
+									{
+										Debug.LogError("Invalid BS Sequence!!!!!!");
+									}
+									frameLen++;
+									idx++;
+								}
+								else
+								{
+									frame[frameLen] = buf.Get(idx);
+									frameLen++;
+								}
+							}
 
-        if ((roll < -90 && kalAngleX > 90) || (roll > 90 && kalAngleX < -90))
-        {
-            kalmanX.setAngle((float)roll);
-            compAngleX = roll;
-            kalAngleX = roll;
-            gyroXangle = roll;
-        }
-        else
-            kalAngleX = kalmanX.getAngle((float)roll, (float)gyroXrate, dt); // Calculate the angle using a Kalman filter
+							buf.Pop(i + 1);
 
-        if (Math.Abs(kalAngleX) > 90)
-            gyroYrate = -gyroYrate; // Invert rate, so it fits the restriced accelerometer reading
-        kalAngleY = kalmanY.getAngle((float)pitch, (float)gyroYrate, dt);
-
-        gyroXangle += gyroXrate * dt; // Calculate gyro angle without any filter
-        gyroYangle += gyroYrate * dt;
-        //gyroXangle += kalmanX.getRate() * dt; // Calculate gyro angle using the unbiased rate
-        //gyroYangle += kalmanY.getRate() * dt;
-
-        compAngleX = 0.93 * (compAngleX + gyroXrate * dt) + 0.07 * roll; // Calculate the angle using a Complimentary filter
-        compAngleY = 0.93 * (compAngleY + gyroYrate * dt) + 0.07 * pitch;
-
-        // Reset the gyro angle when it has drifted too much
-        if (gyroXangle < -180 || gyroXangle > 180)
-            gyroXangle = kalAngleX;
-        if (gyroYangle < -180 || gyroYangle > 180)
-            gyroYangle = kalAngleY;
-
-        //Debug.Log(kalAngleX.ToString() + " " + kalAngleY.ToString());
-        yaw = 180 * Math.Atan(Math.Sqrt(y_acc * y_acc + x_acc * x_acc) / z_acc) / Math.PI;
-        model.transform.rotation = Quaternion.Euler((float)kalAngleX, (float)kalAngleY, (float)yaw);
-    }
+							if (checkCKS(frame.Take(i).ToArray()))
+							{   // 체크섬 통과
+								if (frame[2] == 0x13 + 0x80)
+								{
+									Debug.Log(segName + " Rcv Msg : " + string.Join(", ", frame));
+								}
+								else if (frame[2] == 0x08)
+								{ // Command Check
+									FusionFxFrame fx = new FusionFxFrame(frame);
 
 
+									heTxt.GetComponent<Text>().text = comPort + "(" + segName + ") : " + fx.headingErr;
 
-    void OnApplicationQuit()
-    {
-        m_SerialPort.Close();
-    }
-}
+									if (doCalibarate)
+									{
+										//calibrationVector = new Vector3(fx.rot_y, -fx.rot_x, fx.rot_z);
 
-class Kalman
-{
-    private float Q_angle = 0.001f;
-    private float Q_bias = 0.003f;
-    private float R_measure = 0.03f;
+										if (testCore != null) testCore.rotation = Quaternion.Euler(0, 0, 90);
 
-    private float angle = 0.0f;
-    private float bias = 0.0f;
-    private float rate;
+										transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
 
-    private float[,] P = new float[2, 2];
+										//segment.rotation = Quaternion.Euler(0,0,90);
+										if (segName.Equals("leftUpperArm")) segment.rotation = Quaternion.Euler(0, 0, 90);
+										else segment.rotation = Quaternion.Euler(0, 0, 90);
 
-    public float getAngle(float newAngle, float newRate, float dt)
-    {
-        rate = newRate - bias;
-        angle += dt * rate;
+										isCalibrate = true;
+										doCalibarate = false;
+									}
 
-        // Update estimation error covariance - Project the error covariance ahead
-        /* Step 2 */
-        P[0, 0] += dt * (dt * P[1, 1] - P[0, 1] - P[1, 0] + Q_angle);
-        P[0, 1] -= dt * P[1, 1];
-        P[1, 0] -= dt * P[1, 1];
-        P[1, 1] += Q_bias * dt;
+									if (isCalibrate)
+									{
 
-        // Discrete Kalman filter measurement update equations - Measurement Update ("Correct")
-        // Calculate Kalman gain - Compute the Kalman gain
-        /* Step 4 */
-        float S = P[0, 0] + R_measure; // Estimate error
-        /* Step 5 */
-        float[] K = new float[2]; // Kalman gain - This is a 2x1 vector
-        K[0] = P[0, 0] / S;
-        K[1] = P[1, 0] / S;
+										if (testCore != null && segCore != null)
+										{
+											segCore.transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);  // 절대
+											testCore.transform.rotation = segment.rotation; // 보정
+										}
+										transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
 
-        // Calculate angle and bias - Update estimate with measurement zk (newAngle)
-        /* Step 3 */
-        float y = newAngle - angle; // Angle difference
-        /* Step 6 */
-        angle += K[0] * y;
-        bias += K[1] * y;
+										//if (segName.Equals("leftLowerArm")) Debug.Log("" + transform.eulerAngles);
+										/*
+										if (testCore != null && segCore != null)
+										{
+											segCore.transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
+											testCore.transform.rotation = segCore.transform.rotation;
+											testCore.transform.Rotate(calibrationVector);
+											if (segName.Equals("leftUpperArm"))
+												testCore.transform.Rotate(new Vector3(0, 0, 90));
+											transform.rotation = testCore.transform.rotation;
+										}
+										{
+											transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
+											transform.Rotate(calibrationVector);
+											if (segName.Equals("leftUpperArm"))
+												transform.Rotate(new Vector3(0, 0, 90));
+										}
+										*/
+									}
+								}
+							}
+							else
+							{
+								Debug.LogError("CehckSum Failed : [" + i + "] " + string.Join(", ", frame));
+							}
 
-        // Calculate estimation error covariance - Update the error covariance
-        /* Step 7 */
-        float P00_temp = P[0, 0];
-        float P01_temp = P[0, 1];
+							break;
+						}
+					}
 
-        P[0, 0] -= K[0] * P00_temp;
-        P[0, 1] -= K[0] * P01_temp;
-        P[1, 0] -= K[1] * P00_temp;
-        P[1, 1] -= K[1] * P01_temp;
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Debug.Log(e);
+		}
+	}
 
-        return angle;
-    }
+	public void startCalibration(string seg)
+	{
+		segName = seg;
+		heTxt.GetComponent<Text>().text = comPort + "(" + segName + ") : ";
+		doCalibarate = true;
+	}
 
-    public void setAngle(float angle)
-    {
-        this.angle = angle;
-    }
+	public void testFunction()
+	{
+		//transform.rotation = Quaternion.Euler(0,0,90);
 
-    public float getRate()
-    {
-        return this.rate;
-    }
 
-    public void setQangle(float Q_angle)
-    {
-        this.Q_angle = Q_angle;
-    }
+		//transform.rotation = Quaternion.Euler(30,40,60);
 
-    public void setQbias(float Q_bias)
-    {
-        this.Q_bias = Q_bias;
-    }
+		//segment.rotation = Quaternion.Euler(0,0,90);
+		//transform.rotation = Quaternion.Euler(0,0,180);
+		//segCore.rotation = Quaternion.Euler(0,90,0);
+		onClickBtnSendMsg();
+	}
 
-    public void setRmeasure(float R_measure) { this.R_measure = R_measure; }
+	private void OnApplicationQuit()
+	{
+		sendStopMsg();
+		port.Close();
+	}
 
-    public float getQangle() { return this.Q_angle; }
 
-    public float getQbias() { return this.Q_bias; }
+	public void onClickBtnSendMsg()
+	{
+		var testFrame = new byte[5];
 
-    public float getRmeasure() { return this.R_measure; }
+		testFrame[0] = 50;      // dst addr
+		testFrame[1] = 1;       // src addr
+		testFrame[2] = 0x13;    // cmd 1 = ping cmd 0x13 get Output type
+		testFrame[3] = 0;
+		testFrame[4] = TMsg_EOF;
+
+		testFrame[3] = computeCKS(testFrame);
+
+		port.Write(testFrame, 0, 5);
+	}
+
+	public void sendStartMsg()
+	{
+		var startFrame = new byte[6];
+
+		startFrame[0] = 50;
+		startFrame[1] = 1;
+		startFrame[2] = 0x08;
+		startFrame[3] = 0x70;
+		startFrame[4] = 0;
+		startFrame[5] = TMsg_EOF;
+
+		startFrame[4] = computeCKS(startFrame);
+
+		port.Write(startFrame, 0, 6);
+	}
+
+	public void sendStopMsg()
+	{
+		var testFrame = new byte[5];
+
+		testFrame[0] = 50;      // dst addr
+		testFrame[1] = 1;       // src addr
+		testFrame[2] = 0x09;        // cmd 1 = ping
+		testFrame[3] = 0;
+		testFrame[4] = TMsg_EOF;
+
+		testFrame[3] = computeCKS(testFrame);
+
+		port.Write(testFrame, 0, 5);
+	}
+
+	private byte computeCKS(byte[] frame)
+	{
+		byte rtv = 0;
+
+		foreach (byte b in frame)
+		{
+			if (b != TMsg_EOF) rtv -= b;
+		}
+
+		return rtv;
+	}
+
+	private bool checkCKS(byte[] frame)
+	{
+		byte rtv = 0;
+
+		foreach (byte b in frame)
+		{
+			rtv += b;
+		}
+
+		return (rtv == 0) ? true : false;
+	}
 }
