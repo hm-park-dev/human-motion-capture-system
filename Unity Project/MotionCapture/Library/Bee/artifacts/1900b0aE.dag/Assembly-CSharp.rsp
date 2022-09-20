@@ -356,6 +356,7 @@
 "Assets/Scripts/Library/FusionFxFrame.cs"
 "Assets/Scripts/Library/SimpleCircularBuffer.cs"
 "Assets/Scripts/Move.cs"
+"Assets/Scripts/TestTCP.cs"
 -langversion:9.0
 
 /deterministic
