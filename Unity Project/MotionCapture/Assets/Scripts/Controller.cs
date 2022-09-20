@@ -61,7 +61,7 @@ public class Controller : MonoBehaviour
         {
             syncTime -= Time.deltaTime;
 
-            billboardText.GetComponent<Text>().text = string.Format("ÁØºñÇÏ¼¼¿ä.\n{0:0.00}", syncTime);
+            billboardText.GetComponent<Text>().text = string.Format("ì¤€ë¹„í•˜ì„¸ìš”.\n{0:0.00}", syncTime);
 
             if (syncTime < 0)
             {
@@ -75,7 +75,7 @@ public class Controller : MonoBehaviour
                     {
                         receiveBuffer = new byte[500];
                         string msg = reader.ReadLine();
-                        //Debug.Log(msg);
+                        // Debug.Log(msg);
 
                         string[] split_msg = msg.Split(',');
 
