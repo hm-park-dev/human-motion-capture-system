@@ -30,6 +30,7 @@ public class Controller : MonoBehaviour
     [SerializeField] private Button syncButton;
     [SerializeField] private Text streamingBtnText;
     [SerializeField] private Text billboardText;
+    [SerializeField] private Text connectionText;
 
     private bool streaming = false;
     private bool synchronizing = false;
@@ -45,6 +46,9 @@ public class Controller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        billboardText.GetComponent<Text>().text = "";
+        connectionText.GetComponent<Text>().text = "Gateway IP: " + serverIP + "\nPort: " + Port.ToString();
         streamingButton.onClick.AddListener(OnClickStreaming);
         syncButton.onClick.AddListener(OnClickSyncBtn);
 
@@ -188,11 +192,13 @@ public class Controller : MonoBehaviour
                 reader = new StreamReader(stream);
                 Debug.Log("Connect Success");
                 socketReady = true;
+                billboardText.GetComponent<Text>().text = "Connect Success";
             }
         }
         catch (Exception e)
         {
             Debug.Log("On client connect exception " + e);
+            billboardText.GetComponent<Text>().text = "Connect Fail";
         }
     }
 
