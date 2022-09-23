@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 public class Controller : MonoBehaviour
 {
     [SerializeField]
-    private Move leftUpperArm;
+    private Motion leftUpperArm;
 
     [Header("Socket Conf")]
     [SerializeField] private string serverIP = "192.168.0.11";
@@ -23,7 +23,7 @@ public class Controller : MonoBehaviour
     bool socketReady = false;
     NetworkStream stream;
 
-    private Dictionary<string, Move> comPorts;
+    private Dictionary<string, Motion> comPorts;
 
     [Header("Button Conf")]
     [SerializeField] private Button streamingButton;
@@ -52,7 +52,7 @@ public class Controller : MonoBehaviour
         streamingButton.onClick.AddListener(OnClickStreaming);
         syncButton.onClick.AddListener(OnClickSyncBtn);
 
-        comPorts = new Dictionary<string, Move>();
+        comPorts = new Dictionary<string, Motion>();
         if (leftUpperArm != null) comPorts.Add("leftUpperArm", leftUpperArm);
 
     }
@@ -101,7 +101,7 @@ public class Controller : MonoBehaviour
                         }
 
                     }
-                    foreach (KeyValuePair<string, Move> element in comPorts)
+                    foreach (KeyValuePair<string, Motion> element in comPorts)
                     {
                         element.Value.startCalibration(element.Key);
                     }

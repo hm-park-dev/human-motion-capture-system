@@ -36,11 +36,11 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\move.cs" />
      <Compile Include="Assets\Scripts\Librarys\FusionFxFrame.cs" />
      <Compile Include="Assets\Scripts\TestTCP.cs" />
      <Compile Include="Assets\Scripts\Controller.cs" />
      <Compile Include="Assets\Scripts\Librarys\SimpleCircularBuffer.cs" />
+     <Compile Include="Assets\Scripts\Motion.cs" />
     <Reference Include="UnityEngine">
         <HintPath>D:\unity\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
