@@ -10,8 +10,14 @@ using System.Runtime.InteropServices;
 
 public class Controller : MonoBehaviour
 {
-    [SerializeField]
-    private Motion leftUpperArm;
+    [Header("Motion")]
+    [SerializeField] private Motion leftUpperArm;
+    [SerializeField] private Motion leftForearm;
+    [SerializeField] private Motion leftWrist;
+    [SerializeField] private Motion rightUpperArm;
+    [SerializeField] private Motion rightForearm;
+    [SerializeField] private Motion rightWrist;
+
 
     [Header("Socket Conf")]
     [SerializeField] private string serverIP = "192.168.0.11";
@@ -54,6 +60,11 @@ public class Controller : MonoBehaviour
 
         comPorts = new Dictionary<string, Motion>();
         if (leftUpperArm != null) comPorts.Add("leftUpperArm", leftUpperArm);
+        if (leftForearm != null) comPorts.Add("leftForearm", leftForearm);
+        if (leftWrist != null) comPorts.Add("leftWrist", leftWrist);
+        if (rightUpperArm != null) comPorts.Add("leftWrist", leftWrist);
+        if (rightForearm != null) comPorts.Add("leftWrist", leftWrist);
+        if (rightWrist != null) comPorts.Add("leftWrist", leftWrist);
 
     }
 
@@ -91,8 +102,23 @@ public class Controller : MonoBehaviour
                             w = float.Parse(split_msg[9]);
                             switch (split_msg[0])
                             {
+                                case "P2PSRV1":
+                                    leftWrist.sendQuaternion(i, j, k, w);
+                                    break;
                                 case "P2PSRV2":
+                                    leftForearm.sendQuaternion(i, j, k, w);
+                                    break;
+                                case "P2PSRV4":
                                     leftUpperArm.sendQuaternion(i, j, k, w);
+                                    break;
+                                case "P2PSRV3":
+                                    rightUpperArm.sendQuaternion(i, j, k, w);
+                                    break;
+                                case "P2PSRV5":
+                                    rightForearm.sendQuaternion(i, j, k, w);
+                                    break;
+                                case "P2PSRV6":
+                                    rightWrist.sendQuaternion(i, j, k, w);
                                     break;
                                 default:
                                     break;
@@ -133,13 +159,32 @@ public class Controller : MonoBehaviour
 
                         switch (split_msg[0])
                         {
+                            case "P2PSRV1":
+                                leftWrist.sendQuaternion(i, j, k, w);
+                                break;
                             case "P2PSRV2":
+                                leftForearm.sendQuaternion(i, j, k, w);
+                                break;
+                            case "P2PSRV4":
                                 leftUpperArm.sendQuaternion(i, j, k, w);
                                 break;
+                            case "P2PSRV3":
+                                rightUpperArm.sendQuaternion(i, j, k, w);
+                                break;
+                            case "P2PSRV5":
+                                rightForearm.sendQuaternion(i, j, k, w);
+                                break;
+                            case "P2PSRV6":
+                                rightWrist.sendQuaternion(i, j, k, w);
+                                break;
                             default:
+                                Debug.Log("switch default: " + split_msg[0]);
                                 break;
                         }
                         
+                    }
+                    else {
+                        Debug.Log("Error MSG: " + msg);
                     }
 
                 }

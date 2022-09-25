@@ -406,9 +406,9 @@ static void Quat_Update(IKS01A3_MOTION_SENSOR_Axes_t *data)
 #if(CFG_DEBUG_APP_TRACE != 0)
     APP_DBG_MSG("-- MOTIONFX APPLICATION SERVER : NOTIFY CLIENT WITH NEW QUAT PARAMETER VALUE \n ");
     APP_DBG_MSG(" \n\r");
-    APP_DBG_MSG("%d, %d, %d / %d, %d, %d / %d, %d, %d\n\r", *(value+2), *(value+4), *(value+6),
-    								*(value+8), *(value+10), *(value+12),
-									*(value+14), *(value+16), *(value+18));
+    APP_DBG_MSG("%d,%d,%d/%d,%d,%d/%d,%d,%d\n\r", data[0].x, data[0].y, data[0].z,
+                                     data[1].x, data[1].y, data[1].z,
+                                    data[2].x, data[2].y, data[2].z);
 #endif
     MOTENV_STM_App_Update_Char(MOTION_FX_CHAR_UUID, VALUE_LEN_QUAT, (uint8_t *)&value);
   }
