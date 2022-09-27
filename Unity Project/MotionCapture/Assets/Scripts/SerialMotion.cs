@@ -33,7 +33,7 @@ public class SerialMotion : MonoBehaviour
     private float qs;
     private float SCALE_FACTOR = 10000.0f;
     private Quaternion quat;
-
+    private Quaternion rotOffset = Quaternion.identity;
 
     private string strExt = "-- MOTIONFX APPLICATION SERVER : NOTIFY CLIENT WITH NEW QUAT PARAMETER VALUE \n  \n";
     // Start is called before the first frame update
@@ -78,8 +78,14 @@ public class SerialMotion : MonoBehaviour
 
                     if (doCalibarate)
                     {
+                        rotOffset = transform.rotation;
+                        if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,90);
+                        //if (testCore != null) testCore.localEulerAngles = new Vector3(0,0,90);
+
                         transform.rotation = Quaternion.Euler(quat.eulerAngles);
-                        segment.rotation = Quaternion.Euler(0,0,90);
+
+                        //segment.rotation = Quaternion.Euler(0,0,90);
+                        //segment.localEulerAngles = new Vector3(0,0,90);
 
                         isCalibrate = true;
                         doCalibarate = false;
@@ -91,10 +97,12 @@ public class SerialMotion : MonoBehaviour
                         {
                             //segCore.transform.rotation = Quaternion.Euler(FromQ2(q));  // ����
                             //testCore.transform.rotation = segment.rotation; // ����
-                            testCore.rotation = Quaternion.Euler(quat.eulerAngles);
+                            //testCore.rotation = Quaternion.Euler(quat.eulerAngles);
                             //testCore.rotation = Quaternion.Lerp(testCore.rotation, quat, 0.8f);
+                            testCore.transform.rotation = segment.rotation;
                         }
-                        transform.rotation = Quaternion.Euler(quat.eulerAngles);
+                        //transform.rotation = Quaternion.Euler(quat.eulerAngles);
+                        transform.rotation = Quaternion.Inverse(rotOffset)* quat; 
                     }
                     
                 }
