@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641252, b: 0.5748167, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -336,6 +336,7 @@ GameObject:
   m_Component:
   - component: {fileID: 196114159}
   - component: {fileID: 196114160}
+  - component: {fileID: 196114161}
   m_Layer: 0
   m_Name: LLA_Seg
   m_TagString: Untagged
@@ -375,6 +376,24 @@ MonoBehaviour:
   segCore: {fileID: 0}
   testCore: {fileID: 499073542}
   heTxt: {fileID: 0}
+--- !u!114 &196114161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 196114158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99fe79d9b5bea1944a680d2a982cc98d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baudrate: 115200
+  comPort: COM15
+  segment: {fileID: 6099543329377280625}
+  segCore: {fileID: 0}
+  testCore: {fileID: 499073542}
+  msgText: {fileID: 0}
 --- !u!1 &216624096
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,6 +1326,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leftUpperArm: {fileID: 1558346869}
+  leftLowerArm: {fileID: 196114161}
   streamingButton: {fileID: 558699529}
   syncButton: {fileID: 1669990243}
   streamingBtnText: {fileID: 306563130}
@@ -1587,7 +1607,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baudrate: 115200
-  comPort: COM3
+  comPort: COM5
   segment: {fileID: 376430621910806098}
   segCore: {fileID: 0}
   testCore: {fileID: 708633927}

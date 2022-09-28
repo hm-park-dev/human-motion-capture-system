@@ -43,6 +43,14 @@ public class SerialMotion : MonoBehaviour
         port.ReadTimeout = 30;
         port.Open();
         quat = Quaternion.identity;
+
+        if (port.IsOpen)
+        {
+            Debug.Log(comPort + " is OPEN!");
+        }
+        else {
+            Debug.Log(comPort + " is OPEN FAILED!");
+        }
     }
 
     // Update is called once per frame
@@ -71,20 +79,20 @@ public class SerialMotion : MonoBehaviour
                     qk = float.Parse(q[2]) / SCALE_FACTOR;
                     
                     
-                    qs = ComputeQs(qi, qj, qk);
-                    quat.Set(qi, qj, qk , qs);
-                    Debug.Log(qi.ToString() + "," + qj.ToString() + "," + qk.ToString() + "," + qs.ToString());
+                    qs = ComputeQs(qj, qi, qk);
+                    quat.Set(qj, qi, qk , qs);
+                    // Debug.Log(qi.ToString() + "," + qj.ToString() + "," + qk.ToString() + "," + qs.ToString());
 
 
                     if (doCalibarate)
                     {
                         //rotOffset = transform.rotation;
                         rotOffset = transform.localRotation;
-                        if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,90);
+                        if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
 
                         transform.rotation = quat;
                         
-                        segment.rotation = Quaternion.Euler(0,0,90);
+                        segment.rotation = Quaternion.Euler(0,0,-90);
 
                         isCalibrate = true;
                         doCalibarate = false;
@@ -95,6 +103,7 @@ public class SerialMotion : MonoBehaviour
                         if (testCore != null)
                         {
                             testCore.transform.rotation = segment.rotation;
+                            //testCore.transform.rotation = quat;
                         }
                         transform.rotation = quat; 
                         
