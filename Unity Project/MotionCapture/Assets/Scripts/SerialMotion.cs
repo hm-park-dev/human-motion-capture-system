@@ -78,14 +78,13 @@ public class SerialMotion : MonoBehaviour
 
                     if (doCalibarate)
                     {
-                        rotOffset = transform.rotation;
+                        //rotOffset = transform.rotation;
+                        rotOffset = transform.localRotation;
                         if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,90);
-                        //if (testCore != null) testCore.localEulerAngles = new Vector3(0,0,90);
 
-                        transform.rotation = Quaternion.Euler(quat.eulerAngles);
-
-                        //segment.rotation = Quaternion.Euler(0,0,90);
-                        //segment.localEulerAngles = new Vector3(0,0,90);
+                        transform.rotation = quat;
+                        
+                        segment.rotation = Quaternion.Euler(0,0,90);
 
                         isCalibrate = true;
                         doCalibarate = false;
@@ -95,14 +94,10 @@ public class SerialMotion : MonoBehaviour
                     {
                         if (testCore != null)
                         {
-                            //segCore.transform.rotation = Quaternion.Euler(FromQ2(q));  // ����
-                            //testCore.transform.rotation = segment.rotation; // ����
-                            //testCore.rotation = Quaternion.Euler(quat.eulerAngles);
-                            //testCore.rotation = Quaternion.Lerp(testCore.rotation, quat, 0.8f);
                             testCore.transform.rotation = segment.rotation;
                         }
-                        //transform.rotation = Quaternion.Euler(quat.eulerAngles);
-                        transform.rotation = Quaternion.Inverse(rotOffset)* quat; 
+                        transform.rotation = quat; 
+                        
                     }
                     
                 }
@@ -146,4 +141,12 @@ public class SerialMotion : MonoBehaviour
             return 0;
         }
     }
+
+    Quaternion getEulerInverse (Quaternion q)
+	{
+		Vector3 e = q.eulerAngles;
+		e.x *= -1;
+		e.y *= -1;
+		return Quaternion.Euler (e);
+	}
 }
