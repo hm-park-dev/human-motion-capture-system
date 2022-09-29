@@ -94,12 +94,12 @@ public class Controller : MonoBehaviour
 
                         string[] split_msg = msg.Split(',');
 
-                        if (split_msg.Length == 10)
+                        if (split_msg.Length == 16)
                         {
-                            i = float.Parse(split_msg[3]);
-                            j = float.Parse(split_msg[5]);
-                            k = float.Parse(split_msg[7]);
-                            w = float.Parse(split_msg[9]);
+                            i = float.Parse(split_msg[1]);
+                            j = float.Parse(split_msg[2]);
+                            k = float.Parse(split_msg[3]);
+                            w = float.Parse(split_msg[4]);
                             switch (split_msg[0])
                             {
                                 case "P2PSRV1":
@@ -150,12 +150,12 @@ public class Controller : MonoBehaviour
 
                     string[] split_msg = msg.Split(',');
 
-                    if (split_msg.Length == 10)
+                    if (split_msg.Length == 16)
                     {
-                        i = float.Parse(split_msg[3]);
-                        j = float.Parse(split_msg[5]);
-                        k = float.Parse(split_msg[7]);
-                        w = float.Parse(split_msg[9]);
+                        i = float.Parse(split_msg[1]);
+                        j = float.Parse(split_msg[2]);
+                        k = float.Parse(split_msg[3]);
+                        w = float.Parse(split_msg[4]);
 
                         switch (split_msg[0])
                         {

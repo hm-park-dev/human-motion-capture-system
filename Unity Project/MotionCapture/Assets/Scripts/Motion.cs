@@ -28,7 +28,8 @@ public class Motion : MonoBehaviour
 	private float j = 0f;
 	private float k = 0f;
 	private float w = 0f;
-	private Quaternion q;
+	private Quaternion quat = Quaternion.identity;
+    private Quaternion rotOffset = Quaternion.identity;
 
 	private string segName;
 
@@ -37,65 +38,37 @@ public class Motion : MonoBehaviour
 	void Start()
 	{
 		receiveBuffer = new byte[256];
-		q = new Quaternion(i, j, k, w);
 	}
 
 	void Update()
 	{
 
 		if (doCalibarate)
-		{
-			//Debug.Log("doing doCalibarate");
-			// calibrationVector = new Vector3(j, -i, k);
+                    {
+                        //rotOffset = transform.rotation;
+                        rotOffset = transform.localRotation;
+                        if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
 
-			// if (testCore != null) testCore.rotation = Quaternion.Euler(0, 0, 90);
-			transform.rotation = Quaternion.Euler(q.eulerAngles);
-			//transform.rotation = Quaternion.Lerp(transform.rotation, q, 0.8f);
+                        transform.rotation = quat;
+                        
+                        segment.rotation = Quaternion.Euler(0,0,-90);
 
-			segment.rotation = Quaternion.Euler(0,0,90);
-			// if (segName.Equals("Left_Upper_Arm_Joint_01"))
-			// 	segment.rotation = Quaternion.Euler(0, 0, 90);
-			// else segment.rotation = Quaternion.Euler(0, 0, 90);
+                        isCalibrate = true;
+                        doCalibarate = false;
+                    }
 
-			isCalibrate = true;
-			doCalibarate = false;
-		}
-
-		if (isCalibrate)
-		{
-			// Debug.Log("doing isCalibarate");
-			// Debug.Log("i: " + i + " j: " + j + " k: " + k + " w: " + w);
-			if (testCore != null)
-			{
-				//segCore.transform.rotation = Quaternion.Euler(FromQ2(q));  // ����
-				//testCore.transform.rotation = segment.rotation; // ����
-				//testCore.rotation = Quaternion.Euler(q.eulerAngles);
-				testCore.rotation = Quaternion.Lerp(testCore.rotation, q, 0.8f);
-			}
-			transform.rotation = Quaternion.Euler(q.eulerAngles);
-			//transform.rotation = Quaternion.Lerp(transform.rotation, q, 0.8f);
-
-
-			//if (segName.Equals("leftLowerArm")) Debug.Log("" + transform.eulerAngles);
-			/*
-			if (testCore != null && segCore != null)
-			{
-				segCore.transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
-				testCore.transform.rotation = segCore.transform.rotation;
-				testCore.transform.Rotate(calibrationVector);
-				if (segName.Equals("leftUpperArm"))
-					testCore.transform.Rotate(new Vector3(0, 0, 90));
-				transform.rotation = testCore.transform.rotation;
-			}
-			{
-				transform.rotation = Quaternion.Euler(-fx.rot_y, fx.rot_x, -fx.rot_z);
-				transform.Rotate(calibrationVector);
-				if (segName.Equals("leftUpperArm"))
-					transform.Rotate(new Vector3(0, 0, 90));
-			}
-			*/
-		}
+                    if (isCalibrate)
+                    {
+                        if (testCore != null)
+                        {
+                            testCore.transform.rotation = segment.rotation;
+                            //testCore.transform.rotation = quat;
+                        }
+                        transform.rotation = quat; 
+                        
+                    }
 	}
+
 
 	public void startCalibration(string seg)
 	{
@@ -112,7 +85,7 @@ public class Motion : MonoBehaviour
 		w = qs;
 
 
-		q.Set(i, j, k, w);
+		quat.Set(i, j, k, w);
 	}
 
 }
