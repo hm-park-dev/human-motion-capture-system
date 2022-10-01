@@ -62,9 +62,9 @@ public class Controller : MonoBehaviour
         if (leftUpperArm != null) comPorts.Add("leftUpperArm", leftUpperArm);
         if (leftForearm != null) comPorts.Add("leftForearm", leftForearm);
         if (leftWrist != null) comPorts.Add("leftWrist", leftWrist);
-        if (rightUpperArm != null) comPorts.Add("leftWrist", leftWrist);
-        if (rightForearm != null) comPorts.Add("leftWrist", leftWrist);
-        if (rightWrist != null) comPorts.Add("leftWrist", leftWrist);
+        if (rightUpperArm != null) comPorts.Add("rightUpperArm", rightUpperArm);
+        if (rightForearm != null) comPorts.Add("rightForearm", rightForearm);
+        if (rightWrist != null) comPorts.Add("rightWrist", rightWrist);
 
     }
 
@@ -108,10 +108,10 @@ public class Controller : MonoBehaviour
                                 case "P2PSRV2":
                                     leftForearm.sendQuaternion(i, j, k, w);
                                     break;
-                                case "P2PSRV4":
+                                case "P2PSRV3":
                                     leftUpperArm.sendQuaternion(i, j, k, w);
                                     break;
-                                case "P2PSRV3":
+                                case "P2PSRV4":
                                     rightUpperArm.sendQuaternion(i, j, k, w);
                                     break;
                                 case "P2PSRV5":
@@ -125,12 +125,15 @@ public class Controller : MonoBehaviour
                             }
 
                         }
+                        else {
+                            Debug.Log("length X");
+                        }
 
                     }
-                    foreach (KeyValuePair<string, Motion> element in comPorts)
-                    {
-                        element.Value.startCalibration(element.Key);
-                    }
+                    // foreach (KeyValuePair<string, Motion> element in comPorts)
+                    // {
+                    //     element.Value.startCalibration(element.Key);
+                    // }
                 }
 
                 
@@ -165,10 +168,10 @@ public class Controller : MonoBehaviour
                             case "P2PSRV2":
                                 leftForearm.sendQuaternion(i, j, k, w);
                                 break;
-                            case "P2PSRV4":
+                            case "P2PSRV3":
                                 leftUpperArm.sendQuaternion(i, j, k, w);
                                 break;
-                            case "P2PSRV3":
+                            case "P2PSRV4":
                                 rightUpperArm.sendQuaternion(i, j, k, w);
                                 break;
                             case "P2PSRV5":

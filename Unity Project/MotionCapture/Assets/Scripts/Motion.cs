@@ -22,6 +22,7 @@ public class Motion : MonoBehaviour
 
 	private bool isCalibrate = false;
 	private bool doCalibarate = false;
+	private bool pre = true;
 	private Vector3 calibrationVector;
 
 	private float i = 0f;
@@ -42,9 +43,13 @@ public class Motion : MonoBehaviour
 
 	void Update()
 	{
-
+		if (quat != Quaternion.identity && pre == true)
+		{
+			pre = false;
+			doCalibarate = true;
+		}
 		if (doCalibarate)
-                    {
+        {
                         //rotOffset = transform.rotation;
                         rotOffset = transform.localRotation;
                         if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
@@ -55,18 +60,18 @@ public class Motion : MonoBehaviour
 
                         isCalibrate = true;
                         doCalibarate = false;
-                    }
+        }
 
-                    if (isCalibrate)
-                    {
-                        if (testCore != null)
-                        {
-                            testCore.transform.rotation = segment.rotation;
-                            //testCore.transform.rotation = quat;
-                        }
-                        transform.rotation = quat; 
-                        
+        if (isCalibrate)
+        {
+                if (testCore != null)
+                   {
+                    testCore.transform.rotation = segment.rotation;
+                     //testCore.transform.rotation = quat;
                     }
+                   transform.rotation = quat; 
+                        
+        }
 	}
 
 
@@ -85,7 +90,7 @@ public class Motion : MonoBehaviour
 		w = qs;
 
 
-		quat.Set(i, j, k, w);
+		quat.Set(j, i, k, w);
 	}
 
 }

@@ -108,7 +108,7 @@ void MotionFX_manager_init(void)
   ipKnobs->gbias_gyro_th_sc = GBIAS_GYRO_TH_SC_9X;
   ipKnobs->gbias_mag_th_sc = GBIAS_MAG_TH_SC_9X;
 
-  ipKnobs->output_type = MFX_ENGINE_OUTPUT_ENU;
+  ipKnobs->output_type = MFX_ENGINE_OUTPUT_NED;
   ipKnobs->LMode = 1;
   ipKnobs->modx = DECIMATION;
 

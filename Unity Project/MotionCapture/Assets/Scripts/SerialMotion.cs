@@ -20,7 +20,7 @@ public class SerialMotion : MonoBehaviour
 	[SerializeField] private Transform testCore;
 
 
-    [SerializeField] private Text msgText;
+    // [SerializeField] private Text msgText;
     private bool isSync = false;
     private bool isCalibrate = false;
 	private bool doCalibarate = false;
@@ -62,7 +62,7 @@ public class SerialMotion : MonoBehaviour
             {
                 //string msg = port.ReadTo("-- MOTIONFX APPLICATION SERVER : NOTIFY CLIENT WITH NEW QUAT PARAMETER VALUE");
                 string msg = port.ReadTo("\r");
-                //msgText.GetComponent<Text>().text = msg;
+                // msgText.GetComponent<Text>().text = msg;
                 
                 if (msg.CompareTo(strExt) != 0) 
                 {
