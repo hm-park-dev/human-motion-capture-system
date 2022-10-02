@@ -21,8 +21,8 @@ public class Motion : MonoBehaviour
 	[SerializeField] private Text heTxt;
 
 	private bool isCalibrate = false;
-	private bool doCalibarate = false;
-	private bool pre = true;
+	private bool doCalibrate = false;
+	private bool resync = false;
 	private Vector3 calibrationVector;
 
 	private float i = 0f;
@@ -43,43 +43,37 @@ public class Motion : MonoBehaviour
 
 	void Update()
 	{
-		if (quat != Quaternion.identity && pre == true)
-		{
-			pre = false;
-			doCalibarate = true;
-		}
-		if (doCalibarate)
-        {
-                        //rotOffset = transform.rotation;
-                        rotOffset = transform.localRotation;
-                        if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
+		if (doCalibrate)
+            {
+                //rotOffset = transform.rotation;
+                rotOffset = transform.localRotation;
+                if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
 
-                        transform.rotation = quat;
+                transform.rotation = quat;
                         
-                        segment.rotation = Quaternion.Euler(0,0,-90);
+                segment.rotation = Quaternion.Euler(0,0,-90);
 
-                        isCalibrate = true;
-                        doCalibarate = false;
-        }
+                isCalibrate = true;
+                doCalibrate = false;
+            }
 
-        if (isCalibrate)
-        {
-                if (testCore != null)
-                   {
-                    testCore.transform.rotation = segment.rotation;
-                     //testCore.transform.rotation = quat;
+            if (isCalibrate)
+            {
+                	if (testCore != null)
+                    {
+                        testCore.transform.rotation = segment.rotation;
+                            //testCore.transform.rotation = quat;
                     }
-                   transform.rotation = quat; 
+                transform.rotation = quat; 
                         
-        }
+            }
 	}
 
 
-	public void startCalibration(string seg)
+	public void reSync()
 	{
-		segName = seg;
-		// heTxt.GetComponent<Text>().text = comPort + "(" + segName + ") : ";
-		doCalibarate = true;
+		isCalibrate = false;
+		doCalibrate = true;
 	}
 
 	public void sendQuaternion(float qi, float qj, float qk, float qs)
@@ -93,4 +87,11 @@ public class Motion : MonoBehaviour
 		quat.Set(j, i, k, w);
 	}
 
+	public bool checkReadMessage()
+	{
+		if (quat != Quaternion.identity)
+			return true;
+		else
+			return false;
+	}
 }

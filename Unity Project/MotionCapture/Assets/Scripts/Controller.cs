@@ -22,6 +22,9 @@ public class Controller : MonoBehaviour
     [Header("Socket Conf")]
     [SerializeField] private string serverIP = "192.168.0.11";
     [SerializeField] private int Port = 8080;
+    [SerializeField] private Button newSockSetButton;
+    [SerializeField] private InputField ipField;
+    [SerializeField] private InputField portField;
 
     TcpClient client;
     byte[] receiveBuffer;
@@ -35,6 +38,7 @@ public class Controller : MonoBehaviour
     [SerializeField] private Button streamingButton;
     [SerializeField] private Button syncButton;
     [SerializeField] private Text streamingBtnText;
+    [SerializeField] private Text syncBtnText;
     [SerializeField] private Text billboardText;
     [SerializeField] private Text connectionText;
 
@@ -57,6 +61,7 @@ public class Controller : MonoBehaviour
         connectionText.GetComponent<Text>().text = "Gateway IP: " + serverIP + "\nPort: " + Port.ToString();
         streamingButton.onClick.AddListener(OnClickStreaming);
         syncButton.onClick.AddListener(OnClickSyncBtn);
+        newSockSetButton.onClick.AddListener(OnClickSocketBtn);
 
         comPorts = new Dictionary<string, Motion>();
         if (leftUpperArm != null) comPorts.Add("leftUpperArm", leftUpperArm);
@@ -71,18 +76,23 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        billboardText.GetComponent<Text>().text = "";
+        connectionText.GetComponent<Text>().text = "Gateway IP: " + serverIP + "\nPort: " + Port.ToString();
 
+        // Sync 버튼 클릭시
         if (synchronizing)
         {
             syncTime -= Time.deltaTime;
 
             billboardText.GetComponent<Text>().text = string.Format("준비하세요.\n{0:0.00}", syncTime);
 
+            // Sync 대기 시간이 지남
             if (syncTime < 0)
             {
                 synchronizing = false;
                 billboardText.GetComponent<Text>().text = "";
                 synchronized = true;
+                syncBtnText.GetComponent<Text>().text = "Re Sync";
 
                 if (socketReady)
                 {
@@ -130,15 +140,8 @@ public class Controller : MonoBehaviour
                         }
 
                     }
-                    // foreach (KeyValuePair<string, Motion> element in comPorts)
-                    // {
-                    //     element.Value.startCalibration(element.Key);
-                    // }
                 }
-
-                
             }
-
         }
 
         if (synchronized)
@@ -225,6 +228,21 @@ public class Controller : MonoBehaviour
             billboardText.GetComponent<Text>().text = "" + syncTime;
             synchronizing = true;
         }
+
+        // 다시 싱크 버튼을 클릭한다면
+        if (streaming && synchronized)
+        {
+            foreach (KeyValuePair<string, Motion> element in comPorts)
+               element.Value.reSync();
+        }
+    }
+
+    public void OnClickSocketBtn()
+    {
+        if (ipField != null && ipField.text != "")
+            serverIP = ipField.text;
+        if (portField != null && portField.text != "")
+            Port = Int32.Parse(portField.text);
     }
 
     void CheckReceive()
