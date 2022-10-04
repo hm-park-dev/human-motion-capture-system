@@ -22,7 +22,8 @@ public class Motion : MonoBehaviour
 
 	private bool isCalibrate = false;
 	private bool doCalibrate = false;
-	private bool resync = false;
+	private bool pre = true;
+	private bool received = false;
 	private Vector3 calibrationVector;
 
 	private float i = 0f;
@@ -43,30 +44,60 @@ public class Motion : MonoBehaviour
 
 	void Update()
 	{
+		if (pre && received)
+		{
+			doCalibrate = true;
+			pre = false;
+		}
+		
 		if (doCalibrate)
+        {
+            //rotOffset = transform.rotation;
+            //rotOffset = transform.localRotation;
+            if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
+            transform.rotation = quat;
+            segment.rotation = Quaternion.Euler(0,0,-90);
+
+            isCalibrate = true;
+            doCalibrate = false;
+        }
+
+        if (isCalibrate)
+        {
+            if (testCore != null)
             {
-                //rotOffset = transform.rotation;
-                rotOffset = transform.localRotation;
-                if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
-
-                transform.rotation = quat;
-                        
-                segment.rotation = Quaternion.Euler(0,0,-90);
-
-                isCalibrate = true;
-                doCalibrate = false;
+                testCore.transform.rotation = segment.rotation;
+                //testCore.transform.rotation = quat;
             }
+            transform.rotation = quat; 
+                        
+        }
+		
+		/*
+		// Using Slerp
+		if (doCalibrate)
+        {
+            //rotOffset = transform.rotation;
+            //rotOffset = transform.localRotation;
+            if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
+            transform.rotation = Quaternion.Slerp(transform.rotation, quat, 0.8f);
+            segment.rotation = Quaternion.Euler(0,0,-90);
 
-            if (isCalibrate)
+            isCalibrate = true;
+            doCalibrate = false;
+        }
+
+        if (isCalibrate)
+        {
+            if (testCore != null)
             {
-                	if (testCore != null)
-                    {
-                        testCore.transform.rotation = segment.rotation;
-                            //testCore.transform.rotation = quat;
-                    }
-                transform.rotation = quat; 
-                        
+                testCore.transform.rotation = segment.rotation;
+                //testCore.transform.rotation = quat;
             }
+            transform.rotation = Quaternion.Slerp(transform.rotation, quat, 0.8f);
+                        
+        }
+		*/
 	}
 
 
@@ -82,16 +113,8 @@ public class Motion : MonoBehaviour
 		j = qj;
 		k = qk;
 		w = qs;
-
+		received = true;
 
 		quat.Set(j, i, k, w);
-	}
-
-	public bool checkReadMessage()
-	{
-		if (quat != Quaternion.identity)
-			return true;
-		else
-			return false;
 	}
 }

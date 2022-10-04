@@ -76,7 +76,6 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        billboardText.GetComponent<Text>().text = "";
         connectionText.GetComponent<Text>().text = "Gateway IP: " + serverIP + "\nPort: " + Port.ToString();
 
         // Sync 버튼 클릭시
@@ -184,13 +183,13 @@ public class Controller : MonoBehaviour
                                 rightWrist.sendQuaternion(i, j, k, w);
                                 break;
                             default:
-                                Debug.Log("switch default: " + split_msg[0]);
+                                // Debug.Log("switch default: " + split_msg[0]);
                                 break;
                         }
                         
                     }
                     else {
-                        Debug.Log("Error MSG: " + msg);
+                        Debug.Log("length X");
                     }
 
                 }
