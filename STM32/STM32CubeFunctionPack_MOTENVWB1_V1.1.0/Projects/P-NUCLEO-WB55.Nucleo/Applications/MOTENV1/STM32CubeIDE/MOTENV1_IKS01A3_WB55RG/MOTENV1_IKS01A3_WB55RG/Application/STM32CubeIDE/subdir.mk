@@ -5,7 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 S_SRCS += \
-C:/Users/cude/STM32CubeIDE/wbsensorplussns/STM32CubeFunctionPack_MOTENVWB1_V1.1.0/Projects/P-NUCLEO-WB55.Nucleo/Applications/MOTENV1/STM32CubeIDE/startup_stm32wb55xx_cm4.s 
+C:/Users/dys05/gitttttt/human-motion-capture-system/STM32/STM32CubeFunctionPack_MOTENVWB1_V1.1.0/Projects/P-NUCLEO-WB55.Nucleo/Applications/MOTENV1/STM32CubeIDE/startup_stm32wb55xx_cm4.s 
 
 OBJS += \
 ./Application/STM32CubeIDE/startup_stm32wb55xx_cm4.o 
@@ -15,7 +15,7 @@ S_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Application/STM32CubeIDE/startup_stm32wb55xx_cm4.o: C:/Users/cude/STM32CubeIDE/wbsensorplussns/STM32CubeFunctionPack_MOTENVWB1_V1.1.0/Projects/P-NUCLEO-WB55.Nucleo/Applications/MOTENV1/STM32CubeIDE/startup_stm32wb55xx_cm4.s Application/STM32CubeIDE/subdir.mk
+Application/STM32CubeIDE/startup_stm32wb55xx_cm4.o: C:/Users/dys05/gitttttt/human-motion-capture-system/STM32/STM32CubeFunctionPack_MOTENVWB1_V1.1.0/Projects/P-NUCLEO-WB55.Nucleo/Applications/MOTENV1/STM32CubeIDE/startup_stm32wb55xx_cm4.s Application/STM32CubeIDE/subdir.mk
 	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -c -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -o "$@" "$<"
 
 clean: clean-Application-2f-STM32CubeIDE

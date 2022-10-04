@@ -98,9 +98,9 @@
 #define PUSH_BUTTON_SW1_EXTI_IRQHandler                         EXTI4_IRQHandler
 #define PUSH_BUTTON_SW2_EXTI_IRQHandler                         EXTI0_IRQHandler
 
-#define P2P_SERVER1    1    /*1 = Device is Peripherique*/
+#define P2P_SERVER1    0    /*1 = Device is Peripherique*/
 #define P2P_SERVER2    0
-#define P2P_SERVER3    0
+#define P2P_SERVER3    1
 #define P2P_SERVER4    0
 #define P2P_SERVER5    0
 #define P2P_SERVER6    0
