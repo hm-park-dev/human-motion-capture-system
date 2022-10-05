@@ -20,7 +20,7 @@ public class Controller : MonoBehaviour
 
 
     [Header("Socket Conf")]
-    [SerializeField] private string serverIP = "192.168.0.11";
+    [SerializeField] private string serverIP = "192.168.201.9";
     [SerializeField] private int Port = 8080;
     [SerializeField] private Button newSockSetButton;
     [SerializeField] private InputField ipField;

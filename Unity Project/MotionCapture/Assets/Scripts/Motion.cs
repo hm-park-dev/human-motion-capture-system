@@ -16,6 +16,7 @@ public class Motion : MonoBehaviour
 	[SerializeField] private Transform segment;
 	[SerializeField] private Transform segCore;
 	[SerializeField] private Transform testCore;
+	[SerializeField] private int degre;
 
 	[Header("Text")]
 	[SerializeField] private Text heTxt;
@@ -54,9 +55,10 @@ public class Motion : MonoBehaviour
         {
             //rotOffset = transform.rotation;
             //rotOffset = transform.localRotation;
-            if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
+            if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,degre);
             transform.rotation = quat;
-            segment.rotation = Quaternion.Euler(0,0,-90);
+
+            segment.rotation = Quaternion.Euler(0,0,degre);
 
             isCalibrate = true;
             doCalibrate = false;
@@ -66,11 +68,12 @@ public class Motion : MonoBehaviour
         {
             if (testCore != null)
             {
-                testCore.transform.rotation = segment.rotation;
-                //testCore.transform.rotation = quat;
+                //testCore.transform.rotation = segment.rotation;
+                testCore.transform.rotation = quat;
             }
             transform.rotation = quat; 
-                        
+            // transform.rotation = rotOffset * quat; 
+
         }
 		
 		/*
@@ -115,6 +118,7 @@ public class Motion : MonoBehaviour
 		w = qs;
 		received = true;
 
-		quat.Set(j, i, k, w);
+		// quat.Set(0, i, -j, w);
+		quat.Set(i, k, -j, w);
 	}
 }

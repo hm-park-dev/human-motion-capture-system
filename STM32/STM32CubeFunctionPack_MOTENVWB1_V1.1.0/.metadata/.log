@@ -1,0 +1,21 @@
+!SESSION 2022-10-03 16:13:26.474 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=ko_KR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-10-03 16:13:47.246
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-10-03 16:13:47.300
+!MESSAGE Log4j initialized with config file C:\Users\user\Desktop\gradu\human-motion-capture-system\STM32\STM32CubeFunctionPack_MOTENVWB1_V1.1.0\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-10-03 16:13:54.506
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2022-10-03 16:14:21.328
+!MESSAGE Indexed 'MOTENV1_IKS01A3_WB55RG_OTA' (93 sources, 216 headers) in 6.8 sec: 29,544 declarations; 116,526 references; 0 unresolved inclusions; 1 syntax errors; 218 unresolved names (0.15%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2022-10-03 16:14:25.500
+!MESSAGE Indexed 'MOTENV1_IKS01A3_WB55RG' (93 sources, 229 headers) in 4.17 sec: 32,006 declarations; 138,190 references; 0 unresolved inclusions; 1 syntax errors; 218 unresolved names (0.13%)

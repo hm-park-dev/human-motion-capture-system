@@ -12,6 +12,7 @@ public class SerialMotion : MonoBehaviour
     [Header("Serial Conf")]
 	[SerializeField] private int baudrate = 115200;
 	[SerializeField] private String comPort = "COM5";
+    [SerializeField] private String comPort2 = "COM4";
 	SerialPort port;
 
     [Header("Segment")]
@@ -61,7 +62,8 @@ public class SerialMotion : MonoBehaviour
             if (port.IsOpen)
             {
                 //string msg = port.ReadTo("-- MOTIONFX APPLICATION SERVER : NOTIFY CLIENT WITH NEW QUAT PARAMETER VALUE");
-                string msg = port.ReadTo("\r");
+                string msg = port.ReadTo("\n");
+                //Debug.Log(msg);
                 // msgText.GetComponent<Text>().text = msg;
                 
                 if (msg.CompareTo(strExt) != 0) 
@@ -80,14 +82,18 @@ public class SerialMotion : MonoBehaviour
                     
                     
                     qs = ComputeQs(qj, qi, qk);
-                    quat.Set(qj, qi, qk , qs);
-                    // Debug.Log(qi.ToString() + "," + qj.ToString() + "," + qk.ToString() + "," + qs.ToString());
+                    
+                    //quat.Set(qi, 0, 0, qs);
+                    //quat.Set(0, 0, -qj, qs);
+                    //quat.Set(0, qk, 0, qs);
+                    quat.Set(qi, qk, -qj, qs);
+                    //Debug.Log(qi.ToString() + "," + qj.ToString() + "," + qk.ToString() + "," + qs.ToString());
 
 
                     if (doCalibarate)
                     {
-                        //rotOffset = transform.rotation;
-                        rotOffset = transform.localRotation;
+                        rotOffset = transform.rotation;
+                        //rotOffset = transform.localRotation;
                         if (testCore != null) testCore.rotation = Quaternion.Euler(0,0,-90);
 
                         transform.rotation = quat;
@@ -102,10 +108,10 @@ public class SerialMotion : MonoBehaviour
                     {
                         if (testCore != null)
                         {
-                            testCore.transform.rotation = segment.rotation;
-                            //testCore.transform.rotation = quat;
+                            //testCore.transform.rotation = segment.rotation;
+                            testCore.transform.rotation = rotOffset * quat;
                         }
-                        transform.rotation = quat; 
+                        transform.rotation = rotOffset * quat; 
                         
                     }
                     

@@ -12,7 +12,11 @@ public class SerialController : MonoBehaviour
 {
     [Header("Serial Motion")]
     [SerializeField] private SerialMotion leftUpperArm;
-    [SerializeField] private SerialMotion leftLowerArm;
+    [SerializeField] private SerialMotion leftForearm;
+    // [SerializeField] private SerialMotion leftWrist;
+    // [SerializeField] private SerialMotion rightUpperArm;
+    // [SerializeField] private SerialMotion rightForearm;
+    // [SerializeField] private SerialMotion rightWrist;
 
     private Dictionary<string, SerialMotion> comPorts;
 
@@ -39,7 +43,11 @@ public class SerialController : MonoBehaviour
 
         comPorts = new Dictionary<string, SerialMotion>();
         if (leftUpperArm != null) comPorts.Add("leftUpperArm", leftUpperArm);
-        if (leftLowerArm != null) comPorts.Add("leftLowerArm", leftLowerArm);
+        if (leftForearm != null) comPorts.Add("leftForearm", leftForearm);
+        // if (leftWrist != null) comPorts.Add("leftWrist", leftWrist);
+        // if (rightUpperArm != null) comPorts.Add("rightUpperArm", rightUpperArm);
+        // if (rightForearm != null) comPorts.Add("rightForearm", rightForearm);
+        // if (rightWrist != null) comPorts.Add("rightWrist", rightWrist);
     }
 
     // Update is called once per frame
