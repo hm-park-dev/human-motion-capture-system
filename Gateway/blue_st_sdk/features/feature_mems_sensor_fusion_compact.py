@@ -1,6 +1,7 @@
 # IMPORT
 
 import threading
+import time
 
 from blue_st_sdk.feature import Feature
 from blue_st_sdk.feature import Sample
@@ -47,16 +48,31 @@ class FeatureMemsSensorFusionCompact(FeatureMemsSensorFusion):
         parsedData = data[offset:offset+self.DATA_LENGTH_BYTES*nQuat]
         #print('len : ' + str(len(data)) + ', offset : ' + str(offset))
         #print('buffered ' + str(nQuat) + 'data ' + str(quatDelay))
+
+        # for i in range(nQuat):
+        #     qi = LittleEndian.bytes_to_int16(data, offset) / self.SCALE_FACTOR
+        #     qj = LittleEndian.bytes_to_int16(data, offset+2) / self.SCALE_FACTOR
+        #     qk = LittleEndian.bytes_to_int16(data, offset+4) / self.SCALE_FACTOR
+        #     qs = self._compute_Qs(qi, qj, qk)
+
+        #     if i == 0 :
+        #         self._notif_sample(timestamp, qi, qj, qk, qs, parsedData)
+        #     else:
+        #         DelayUpdate(self, i*quatDelay, timestamp + i, qi, qj, qk, qs)
+        #     offset += self.DATA_LENGTH_BYTES
+
+        sendMsgStr = ""
         for i in range(nQuat):
             qi = LittleEndian.bytes_to_int16(data, offset) / self.SCALE_FACTOR
             qj = LittleEndian.bytes_to_int16(data, offset+2) / self.SCALE_FACTOR
             qk = LittleEndian.bytes_to_int16(data, offset+4) / self.SCALE_FACTOR
             qs = self._compute_Qs(qi, qj, qk)
 
-            if i == 0 :
-                self._notif_sample(timestamp, qi, qj, qk, qs, parsedData)
+            if i == 2:
+                sendMsgStr += f"{qi},{qj},{qk},{qs},{timestamp+i}"
+                self._notif_string(sendMsgStr)
             else:
-                DelayUpdate(self, i*quatDelay, timestamp + i, qi, qj, qk, qs)
+                sendMsgStr += f"{qi},{qj},{qk},{qs},{timestamp+i},"
             offset += self.DATA_LENGTH_BYTES
 
         return ExtractedData(None, nQuat * self.DATA_LENGTH_BYTES)

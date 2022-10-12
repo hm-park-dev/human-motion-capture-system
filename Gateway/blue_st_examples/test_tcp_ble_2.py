@@ -46,6 +46,8 @@ import sys
 import os
 import time
 import threading
+import socket
+from datetime import datetime
 from abc import abstractmethod
 
 sys.path.append('/home/blepi01/BlueSTSDK_Python')
@@ -75,8 +77,15 @@ INTRO = """##################
 ##################"""
 
 # Bluetooth Scanning time in seconds (optional).
-SCANNING_TIME_s = 3
+SCANNING_TIME_s = 2
 
+#MSG = str("PLZ don't show.")
+
+#HOST = '192.168.0.11' 
+HOST = '192.168.201.9'
+PORT = 8080
+
+lock = threading.Lock()
 
 # FUNCTIONS
 
@@ -147,6 +156,11 @@ class MyNodeListener(NodeListener):
 # feature has updated its data.
 #
 class MyFeatureListener(FeatureListener):
+    c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def __init__(self, client_socket):
+        super(MyFeatureListener, self).__init__()
+        self.c_socket = client_socket
     #
     # To be called whenever the feature updates its data.
     #
@@ -156,16 +170,28 @@ class MyFeatureListener(FeatureListener):
     def on_update(self, feature, sample):
         # print('[%s %s %s]' % (feature.get_parent_node().get_name(), \
         #     feature.get_parent_node().get_tag()))
-        print(f"{feature.get_parent_node().get_name()},{feature}")
-
+        with lock : 
+            MSG=f"{feature.get_parent_node().get_name()},{feature}\n"
+            # self.c_socket.sendall(MSG.encode())
+            sam = feature._get_sample()
+            if sam:
+                print(time.strftime('%X', time.localtime(time.time())),MSG, sam.get_notification_time())
+        # print(f"{feature.get_parent_node().get_name()},{feature}")
+    
     def on_update_string(self, feature, strmsg):
-        print(f"{feature.get_parent_node().get_name()},{strmsg}")
+        self.c_socket.sendall(f"{feature.get_parent_node().get_name()},{strmsg}\n".encode())
+        #print(f"{feature.get_parent_node().get_name()},{strmsg}\n")
+        # with lock :
+        #     MSG = f"{feature.get_parent_node().get_name()},{strmsg}\n"
+        #     self.c_socket.sendall(MSG.encode())
+        #     print(MSG)
 
 
 class DeviceThread(threading.Thread):
     """Class to handle a device in a thread."""
+    c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def __init__(self, device, *args, **kwargs):
+    def __init__(self, device, client_socket, *args, **kwargs):
         """Constructor.
 
         Args:
@@ -173,6 +199,7 @@ class DeviceThread(threading.Thread):
         """
         super(DeviceThread, self).__init__(*args, **kwargs)
         self._device = device
+        self.c_socket = client_socket
 
     def run(self):
         """Run the thread."""
@@ -193,7 +220,7 @@ class DeviceThread(threading.Thread):
             if not isinstance(feature, FeatureAudioADPCM) and \
                 not isinstance(feature, FeatureAudioADPCMSync):
 
-                feature.add_listener(MyFeatureListener())
+                feature.add_listener(MyFeatureListener(self.c_socket))
                 self._device.enable_notifications(feature)
 
         # Getting notifications.
@@ -215,6 +242,13 @@ def main(argv):
 
     # Printing intro.
     print_intro()
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
+    client_socket, addr = server_socket.accept()
+    print('Connected by', addr)
 
     try:
         # Creating Bluetooth Manager.
@@ -263,7 +297,7 @@ def main(argv):
             print('\nConnecting to selected devices and getting notifications '
                   'from all their features ("CTRL+C" to exit)...\n')
             for device in selected_devices:
-                device_threads.append(DeviceThread(device).start())
+                device_threads.append(DeviceThread(device, client_socket).start())
         else:
             # Exiting.
             manager.remove_listener(manager_listener)
@@ -273,6 +307,24 @@ def main(argv):
         # Getting notifications.
         while True:
             pass
+            # #server open
+            # server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            # server_socket.bind((HOST, PORT))
+            # server_socket.listen()
+            # client_socket, addr = server_socket.accept()
+            # print('Connected by', addr)
+            # k = 0
+            
+            # while True:
+            #     client_socket.sendall(MSG.encode())
+            #     # print('send 완료 '+ str(k) )
+            #     # k += 1
+            #     print(MSG)
+            #     #pass
+
+            # client_socket.close()
+            # server_socket.close()
 
     except KeyboardInterrupt:
         try:

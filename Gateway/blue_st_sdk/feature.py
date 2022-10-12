@@ -111,6 +111,24 @@ class Feature(object):
         Note: By design, it is the characteristic that offers more features
               beyond the current one, among those offering the current one."""
 
+    # For Fusion Compact 
+    def _notif_string(self, strmsg):
+        """Notify each :class:`blue_st_sdk.feature.FeatureListener`that the
+        feature has been updated.
+
+        Each call runs in a different thread.
+
+        Overwriting the method :meth:`blue_st_sdk.feature.Feature.update()`
+        implies calling this method to notify the user about the new sample.
+
+        Args:
+            sample (:class:`blue_st_sdk.feature.Sample`): Sample data.
+        """
+        for listener in self._listeners:
+            # Calling user-defined callback.
+            self._thread_pool.submit(listener.on_update_string(self, strmsg))
+
+
     def add_listener(self, listener):
         """Add a listener.
         
